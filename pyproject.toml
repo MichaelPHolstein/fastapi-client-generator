@@ -2,7 +2,7 @@
 name = "fastapi-client-generator"
 version = "0.1.0"
 description = "Add your description here"
-authors = [{ name = "Michael Holstein", email = "michael@holstein.nl" }]
+authors = [{ name = "Michael Holstein", email = "michael@holstein.email" }]
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
