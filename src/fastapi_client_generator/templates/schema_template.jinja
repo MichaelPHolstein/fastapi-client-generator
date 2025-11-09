@@ -1,0 +1,15 @@
+from pydantic import Field
+from typing import Optional, List, Any
+from __future__ import annotations
+from .base_schema import BaseSchema
+{%- if import_list %}
+{%- for import in import_list %}
+{{ import }}
+{%- endfor %}
+{%- endif %}
+
+class {{ schema_name }}(BaseSchema):
+
+{%- for field in schema_fields %}
+    {{ field }}
+{%- endfor %}

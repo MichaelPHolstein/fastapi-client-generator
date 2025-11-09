@@ -1,0 +1,36 @@
+[project]
+name = "fastapi-client-generator"
+version = "0.1.0"
+description = "Add your description here"
+authors = [{ name = "Michael Holstein", email = "michael@holstein.nl" }]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "jinja2>=3.1.6",
+    "pydantic>=2.10.6",
+    "requests>=2.32.4",
+    "ruff>=0.14.2",
+    "typer>=0.20.0",
+]
+
+[project.scripts]
+fastapi-client-generator = "fastapi_client_generator:main"
+
+[build-system]
+requires = ["uv_build>=0.9.5,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = ["pytest>=8.3.5", "pytest-cov>=5.0.0"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py38"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

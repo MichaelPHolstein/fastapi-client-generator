@@ -1,0 +1,12 @@
+    
+def {{ method_name }}(self, {{ method_parameters.functional_arguments }}{{ ", " + method_request_body.functional_arguments if method_request_body.exists else "" }}):
+        """{{ method_docstring }}
+        """
+        return self._request_base.{{ method_name}}(
+            uri=f"{{endpoint_path}}",
+            headers={
+                {{ "'Content-Type': content_type, " if method_request_body.exists else "" }}
+                **headers
+            },
+            params={{method_parameters.query_parameters}}
+        )

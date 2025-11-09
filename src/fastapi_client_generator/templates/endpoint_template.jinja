@@ -1,0 +1,16 @@
+from typing import Dict, Optional, Any, Literal
+
+from ..utils.request_base import RequestBase
+
+
+class {{ endpoint_class_name }}:
+
+    def __init__(self, request_base: RequestBase):
+        """This class contains all methods that are available under endpoint `{{ endpoint_path }}`."""
+
+        self._request_base = request_base
+
+
+{%- for method in endpoint_methods %}
+    {{ method }}
+{%- endfor %}
