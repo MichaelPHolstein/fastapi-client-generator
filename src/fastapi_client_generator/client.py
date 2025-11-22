@@ -9,6 +9,7 @@ from fastapi_client_generator.processors.schema_processor import SchemaProcessor
 from fastapi_client_generator.processors.utils_processor import UtilsProcessor
 from fastapi_client_generator.shared.config import Config
 from fastapi_client_generator.shared.utils import download_api_spec_content
+from fastapi import FastAPI
 
 
 class FastapiClientGenerator:
@@ -21,6 +22,18 @@ class FastapiClientGenerator:
             client_name: Name of the generated API client.
         """
         self._client_name = client_name
+
+    def from_fastapi(self, fastapi: FastAPI) -> None:
+        """
+        Generates the API client based on the OpenAPI-spec extracted from a FastAPI instance.
+
+        Args:
+            - fastapi: The FastAPI application instance to extract the OpenAPI schema from.
+        """
+        api_spec = fastapi.openapi()
+
+        config = Config(api_spec=api_spec, client_name=self._client_name)
+        return self._generate(config)
 
     def from_file_path(self, api_spec_file_path: Union[str, Path]) -> None:
         """
