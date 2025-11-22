@@ -21,7 +21,7 @@ class Config:
         )
 
     @property
-    def api_spec_path(self) -> str:
+    def api_spec_path(self) -> Path:
         """Determines the path of the API-spec file."""
         return self.root_path / "api-spec.json"
 

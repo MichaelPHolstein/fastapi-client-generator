@@ -2,7 +2,6 @@ from typing import List, Tuple
 
 from fastapi_client_generator.builders.endpoints.client_base_builder import ClientBaseBuilder
 from fastapi_client_generator.builders.endpoints.endpoint_builder import EndpointBuilder
-from fastapi_client_generator.builders.utils.utils_builder import UtilsBuilder
 from fastapi_client_generator.interfaces.processor_interface import ProcessorInterface
 from fastapi_client_generator.shared.config import Config
 from fastapi_client_generator.shared.utils import pascal_to_snake, snake_to_pascal
@@ -33,10 +32,6 @@ class EndpointProcessor(ProcessorInterface):
         self._config.log_action(action)
 
         self._config.file_manager.create_folder(self._config.root_path / "endpoints")
-
-    def _create_utils(self) -> None:
-        """Triggers the utils builder."""
-        return UtilsBuilder(config=self._config).build()
 
     def _create_endpoints(self) -> None:
         """Collects all paths and converts them to endpoint classes."""
@@ -70,11 +65,6 @@ class EndpointProcessor(ProcessorInterface):
             client_base_classes=self._client_base_classes,
             client_base_imports=self._client_base_imports,
         ).build()
-
-    def _read_endpoint_data(self) -> dict:
-        """Returns all endpoints paths from the `api-spec.json`."""
-        api_spec = self._config.file_manager.load_json(self._config.api_spec_path)
-        return api_spec.get("paths", {})
 
     def _create_endpoint_attribute_name(self, endpoint_path: str) -> str:
         """
@@ -117,3 +107,8 @@ class EndpointProcessor(ProcessorInterface):
         """
 
         return f"from .endpoints.{endpoint_file_name} import {endpoint_class_name}"
+
+    def _read_endpoint_data(self) -> dict:
+        """Returns all endpoints paths from the `api-spec.json`."""
+        api_spec = self._config.file_manager.load_json(self._config.api_spec_path)
+        return api_spec.get("paths", {})

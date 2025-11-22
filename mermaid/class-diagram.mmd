@@ -1,0 +1,246 @@
+classDiagram
+
+    class FastapiClientGenerator {
+        - _config: Config
+
+        + generate()
+    }
+
+    class Config {
+
+        + api_spec_url: str
+        + api_spec_path: Path
+        + client_name: str
+        + client_request_timeout: int
+        + root_path: Path
+        + templates_path: Path
+        + file_manager: FileManager
+        + jinja_env: jinja.Environment
+        + log_action(action:str)
+    }
+
+    class FileManager {
+        + create_folder(folder_path: Path)
+        + load_json(file_path: Path) Union[dict, list]
+        + save_json(file_path: Path, data: Union[dict, list], indent: int)
+        + save_python(file_path: Path, code: str, encoding: str, overwrite: Optional[bool])
+        + remove_file(file_path: Path)
+    }
+
+    class PreProcessor {
+        - _config: Config
+
+        + run()
+        - _create_api_client_folder()
+        - _create_api_spec_file()
+        - _download_api_spec_content()
+    }
+
+    class SchemaProcessor {
+        - _config: Config
+
+        + run()
+        - _create_schema_folder()
+        - _create_base_schema()
+        - _create_schemas()
+        - _read_schema_data() dict
+    }
+
+    class SchemaBuilder {
+        
+        - _config: Config
+        - _schema_name: str
+        - _schema_data: dict
+
+        + build()
+        - _create_file_path() Path
+        - _create_code() str
+        - _create_schema_field_list() List[str]
+        - _create_imports() List[str]
+        - _collect_schema_ref_list() Set[str]
+        - _walk_node(node: Union[dict, list, None], ref_list: Set[str])
+        - _walk_dict(node: dict, ref_list: Set[str])
+        - _walk_list(items: list, ref_list: Set[str])
+        - _add_ref_from_string(ref_str:str, ref_list: Set[str])
+    }
+
+    class SchemaFieldBuilder {
+        - _field_key: str
+        - _field_key_snake_case: str
+        - _field_obj: dict
+        - _schema_obj: dict
+
+        + build()
+        - _validate_key_not_reserved() str
+        - _stringify_field_params(field_params: List[str]) str
+        - _wrap_optional(resolved_type:str) str
+        - _determ_default() str
+        - _determ_common_params() list[str]
+        - _determ_alias() optional[str]
+        - _read_optional_field_param(key:str, key_type: Union[str,int]) Optional[str]
+        - _is_required() bool
+        - _resolve_type() str
+        - _resolve_array_type() str    
+        }
+
+    class UtilsProcessor {
+
+        - _config: Config
+
+        + run()
+        - _create_utils_folder()
+        - _create_utils()
+    }
+
+    class UtilsBuilder {
+        - _config: Config
+
+        + build()
+        - _create_request_base()
+    }
+
+    class EndpointProcessor {
+        - _config: Config
+
+        + run()
+        - _create_endpoint_folder()
+        - _create_endpoints()
+        - _create_client_base()
+        - _create_endpoint_attribute_name(endpoint_path: str) str
+        - _create_endpoint_file_name(endpoint_path: str) str
+        - _create_endpoint_class_name(endpoint_path: str) str
+        - _create_endpoint_import_path(endpoint_file_name: str, endpoint_class_name: str) str
+        - _read_endpoint_data() dict
+    }
+
+    class ClientBaseBuilder {
+
+        - _config: Config
+        - _client_base_classes: List[Tuple[str, str]]
+        - _client_base_imports: List[str]
+
+        + build()
+
+        - _create_client_init()
+        - _create_client_base()
+    }
+
+    class EndpointBuilder {
+        - _config: Config
+        - _endpoint_class_name: str
+        - _endpoint_file_name: str
+        - _endpoint_path: str
+        - _endpoint_data: dict
+
+        + build()
+        - _create_endpoint_file()
+        - _create_file_path() Path
+        - _create_code() str
+        - _create_endpoint_methods() List[str]
+    }
+
+    class EndpointMethodBuilder {
+        - _config: Config
+        - _endpoint_path: str
+        - _method_name: str
+        - _method_data: dict
+
+        + build() str
+        - _process_endpoint_path() str
+    }
+
+    class EndpointMethodDocstringBuilder {
+        - _config: Config
+        - _method_data: dict
+
+        + build() str
+        - _create_summary() str
+        - _create_description() str
+    }
+
+    class EndpointMethodParameterBuilder {
+        - _config: Config
+        - _method_data: dict
+
+        + build() str
+        - _create_functional_arguments() str
+        - _create_docstring_args() List[str]
+        - _convert_param_to_arg(param: Dict) str
+        - _read_param_type(param: Dict) str
+        - _read_param_description(param: Dict) str
+        - _create_query_parameters() str
+        - _create_schema_imports() List[str]
+        - _determ_param_type(param: dict) str
+        - _param_to_func_arg(param:dict) str
+    }
+
+
+    class EndpointMethodRequestBodyBuilder {
+        - _config: Config
+        - _method_data: Dict
+        - _exists: bool
+        - __request_body_type: str
+
+        + build() str
+
+        - _create_functional_arguments() str
+        - _create_docstring_args() List[str]
+        - _create_content_type_func_arg() str
+        - _create_payload_func_arg() str
+        - _create_schema_imports() List[str]
+        - _create_request_body_argument() str
+        - _read_request_body_content() Dict
+        - _determ_content_data_type(content_data) str
+        - _determ_request_body_type() str
+        - _is_content_reference(content_data): bool
+        - _is_existing() bool
+        
+    }
+
+    class EndpointMethodResponseBuilder {
+
+        - _config: Config
+        - _method_data: Dict
+        - _response_ref: Optional[str]
+
+        + build() Dict
+        - _create_response_type() str
+        - _create_method_response() str
+        - _create_schema_imports() List[str]
+        - _create_docstring_return() str
+        - _read_response_ref() Optional[str]
+        - _numbers_in_between(number: int, min: int, max:int) bool
+        - read_content_has_ref(content: Dict) Optional[str]
+    }
+
+    class PostProcessor {
+        - _config: Config
+
+        + run()
+
+        - _ruff_check_api_client_folder()
+        - _ruff_format_api_client_folder()
+        - _remove_api_spec()
+    }
+
+    FastapiClientGenerator --* PreProcessor
+    FastapiClientGenerator --* SchemaProcessor
+    FastapiClientGenerator --* UtilsProcessor
+    FastapiClientGenerator --* EndpointProcessor
+    FastapiClientGenerator --* PostProcessor
+    FastapiClientGenerator --* Config
+    Config --* FileManager
+
+    SchemaProcessor --* SchemaBuilder
+    SchemaBuilder --* SchemaFieldBuilder
+
+    UtilsProcessor --* UtilsBuilder
+
+    EndpointProcessor --* ClientBaseBuilder
+    EndpointProcessor --* EndpointBuilder
+    EndpointBuilder --* EndpointMethodBuilder
+    EndpointMethodBuilder --* EndpointMethodDocstringBuilder
+    EndpointMethodBuilder --* EndpointMethodParameterBuilder
+    EndpointMethodBuilder --* EndpointMethodRequestBodyBuilder
+    EndpointMethodBuilder --* EndpointMethodResponseBuilder
+

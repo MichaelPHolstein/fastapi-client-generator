@@ -8,8 +8,6 @@ from fastapi_client_generator.shared.config import Config
 class UtilsProcessor(ProcessorInterface):
     def __init__(self, config: Config):
         self._config = config
-        self._client_base_classes: List[Tuple[str, str]] = []
-        self._client_base_imports: List[str] = []
 
     def run(self):
         """

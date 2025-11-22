@@ -76,6 +76,7 @@ class SchemaBuilder(BuilderInterface):
         import_list: List[str] = []
 
         for ref_name in sorted(ref_list):
+            # TODO: Use utils
             if ref_name == self._schema_name:
                 continue
 
@@ -137,6 +138,7 @@ class SchemaBuilder(BuilderInterface):
         Extracts the last section of a $ref string which is the schema name thats is required as import.
 
         The value is stored within the ref_list.
+        TODO: Transfer
         """
         if not isinstance(ref_str, str):
             return

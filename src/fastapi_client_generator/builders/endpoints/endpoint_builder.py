@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List
+from typing import Dict
 
 from fastapi_client_generator.builders.endpoints.endpoint_method_builder import (
     EndpointMethodBuilder,
@@ -20,8 +20,8 @@ class EndpointBuilder(BuilderInterface):
     ) -> None:
         super().__init__(config)
         self._endpoint_class_name = endpoint_class_name
-        self._endpoint_path = endpoint_path
         self._endpoint_file_name = endpoint_file_name
+        self._endpoint_path = endpoint_path
         self._endpoint_data = endpoint_data
 
     def build(self):
@@ -51,22 +51,27 @@ class EndpointBuilder(BuilderInterface):
         Returns:
             The rendered Jinja template as a string
         """
+
+        endpoint_methods = self._create_endpoint_methods()
+
         return self._config.jinja_env.get_template(
             name=TemplateEnum.ENDPOINT_TEMPLATE.value,
         ).render(
             {
                 "endpoint_class_name": self._endpoint_class_name,
                 "endpoint_path": self._endpoint_path,
-                "endpoint_methods": self._create_endpoint_methods(),
+                "method_schema_imports": endpoint_methods.get("method_schema_imports", []),
+                "method_functions": endpoint_methods.get("method_functions", []),
             }
         )
 
-    def _create_endpoint_methods(self) -> List[str]:
+    def _create_endpoint_methods(self) -> Dict:
         """
         Calls the `EndpointMethodBuilder` for each method available within the given endpoint.
         """
 
-        generated_endpoint_method = []
+        method_functions = []
+        method_schema_imports = []
 
         for method_name, method_data in self._endpoint_data.items():
             endpoint_method = EndpointMethodBuilder(
@@ -76,6 +81,10 @@ class EndpointBuilder(BuilderInterface):
                 method_data=method_data,
             ).build()
 
-            generated_endpoint_method.append(endpoint_method)
+            method_functions.append(endpoint_method["method_function"])
+            method_schema_imports.extend(endpoint_method["method_schema_imports"])
 
-        return generated_endpoint_method
+        return {
+            "method_functions": method_functions,
+            "method_schema_imports": method_schema_imports,
+        }

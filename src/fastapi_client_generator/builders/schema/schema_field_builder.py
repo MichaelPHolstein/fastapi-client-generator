@@ -1,7 +1,11 @@
 from typing import List, Optional, Union
 
 from fastapi_client_generator.interfaces.builder_interface import BuilderInterface
-from fastapi_client_generator.shared.utils import map_oa_ref, map_primitive, pascal_to_snake
+from fastapi_client_generator.shared.utils import (
+    convert_ref_to_class_name,
+    map_primitive,
+    pascal_to_snake,
+)
 
 
 class SchemaFieldBuilder(BuilderInterface):
@@ -27,9 +31,26 @@ class SchemaFieldBuilder(BuilderInterface):
 
         field_params = [self._determ_default(), *self._determ_common_params(), self._determ_alias()]
         return (
-            f"{self._field_key_snake_case}: {self._wrap_optional(field_type)} "
+            f"{self._validate_key_not_reserved()}: {self._wrap_optional(field_type)} "
             f"= Field({self._stringify_field_params(field_params)})"
         )
+
+    def _validate_key_not_reserved(self) -> str:
+        """
+        Validates if the key of the schema field does not match a reserved python word.
+
+        Adds a '_' when it's reserved.
+
+        Returns:
+            The key of the schema field.
+        """
+
+        reserved_list = ["from"]
+
+        if self._field_key_snake_case not in reserved_list:
+            return self._field_key_snake_case
+
+        return f"{self._field_key_snake_case}_"
 
     def _stringify_field_params(self, field_params: List[Optional[str]]) -> str:
         """Converts the Pydantic field parameters into a list of parameters."""
@@ -70,7 +91,7 @@ class SchemaFieldBuilder(BuilderInterface):
         """
         Attempts to generate an optional Field(...) argument.
         Converts OpenAPI Pascal/mixCase key to snake_case parameter name.
-        Value is safely quoted with repr() if it’s a string.
+        Value is safely quoted with repr() if it's a string.
         """
         if key not in self._field_obj:
             return None
@@ -89,12 +110,12 @@ class SchemaFieldBuilder(BuilderInterface):
         """
         Determines the Python/Pydantic type as a string.
         Cases:
-          - $ref               -> 'RefNameSchema' (or another name, see map_oa_ref)
+          - $ref               -> 'RefNameSchema' (or another name, see convert_ref_to_class_name)
           - type == 'array'    -> 'List[<resolved item type>]'
           - primitive          -> via mapping
         """
         if "$ref" in obj:
-            return map_oa_ref(obj["$ref"])
+            return convert_ref_to_class_name(obj["$ref"])
 
         field_type = obj.get("type")
 
