@@ -110,10 +110,13 @@ class SchemaFieldBuilder(BuilderInterface):
         """
         Determines the Python/Pydantic type as a string.
         Cases:
-          - $ref               -> 'RefNameSchema' (or another name, see convert_ref_to_class_name)
-          - type == 'array'    -> 'List[<resolved item type>]'
-          - primitive          -> via mapping
+        - $ref               -> 'RefNameSchema'
+        - type == 'array'    -> 'List[<resolved item type>]'
+        - primitive          -> via mapping
         """
+        if not isinstance(obj, dict):
+            return "Any"
+
         if "$ref" in obj:
             return convert_ref_to_class_name(obj["$ref"])
 

@@ -1,5 +1,3 @@
-from typing import List, Tuple
-
 from fastapi_client_generator.builders.utils.utils_builder import UtilsBuilder
 from fastapi_client_generator.interfaces.processor_interface import ProcessorInterface
 from fastapi_client_generator.shared.config import Config
@@ -7,7 +5,7 @@ from fastapi_client_generator.shared.config import Config
 
 class UtilsProcessor(ProcessorInterface):
     def __init__(self, config: Config):
-        self._config = config
+        super().__init__(config)
 
     def run(self):
         """

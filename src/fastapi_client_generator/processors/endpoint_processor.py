@@ -9,7 +9,7 @@ from fastapi_client_generator.shared.utils import pascal_to_snake, snake_to_pasc
 
 class EndpointProcessor(ProcessorInterface):
     def __init__(self, config: Config):
-        self._config = config
+        super().__init__(config)
         self._client_base_classes: List[Tuple[str, str]] = []
         self._client_base_imports: List[str] = []
 

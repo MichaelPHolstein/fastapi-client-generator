@@ -39,7 +39,11 @@ class EndpointMethodBuilder(BuilderInterface):
             A dictionary containing the method_template and method_imports
         """
 
-        method_docstring = EndpointMethodDocstringBuilder(self._method_data).build()
+        method_docstring = EndpointMethodDocstringBuilder(
+            endpoint_path=self._endpoint_path,
+            method_name=self._method_name,
+            method_data=self._method_data,
+        ).build()
         method_parameters = EndpointMethodParameterBuilder(self._method_data).build()
         method_request_body = EndpointMethodRequestBodyBuilder(self._method_data).build()
         method_response = EndpointMethodResponseBuilder(self._method_data).build()

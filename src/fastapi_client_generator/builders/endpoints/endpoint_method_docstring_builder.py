@@ -4,9 +4,13 @@ from fastapi_client_generator.interfaces.builder_interface import BuilderInterfa
 class EndpointMethodDocstringBuilder(BuilderInterface):
     def __init__(
         self,
+        endpoint_path: str,
+        method_name: str,
         method_data: dict,
     ) -> None:
         super().__init__(None)
+        self._endpoint_path = endpoint_path
+        self._method_name = method_name
         self._method_data = method_data
 
     def build(self) -> str:

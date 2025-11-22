@@ -1,9 +1,11 @@
 classDiagram
 
     class FastapiClientGenerator {
-        - _config: Config
-
-        + generate()
+        - _client_name: str
+        
+        + from_file_path(api_spec_file_path: Union[str, Path])
+        + from_url(api_spec_url: str)
+        - _generate(config: Config)
     }
 
     class Config {
@@ -33,7 +35,6 @@ classDiagram
         + run()
         - _create_api_client_folder()
         - _create_api_spec_file()
-        - _download_api_spec_content()
     }
 
     class SchemaProcessor {
@@ -151,6 +152,8 @@ classDiagram
 
     class EndpointMethodDocstringBuilder {
         - _config: Config
+        - _endpoint_path: str
+        - _method_name: str
         - _method_data: dict
 
         + build() str

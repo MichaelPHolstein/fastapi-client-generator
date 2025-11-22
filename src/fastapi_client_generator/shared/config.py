@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Dict
 
 import typer
 from jinja2 import Environment, FileSystemLoader
@@ -8,13 +9,22 @@ from fastapi_client_generator.shared.utils import slugify
 
 
 class Config:
-    def __init__(self, api_spec_url: str, client_name: str, client_request_timeout: int = 10):
+    def __init__(self, api_spec: Dict, client_name: str):
+        """
+        Base class that stores imports information.
+
+        This class is initialized in almost every class because it contains the important
+        information.
+
+        Args:
+            - api_spec (Dict): Contains the OpenAPI specification containing all API-information.
+            - client_name (string): The name that the client will have.
+        """
         # Params
-        self.api_spec_url = api_spec_url
+        self.api_spec = api_spec
         self.client_name = client_name
 
         # Depends
-        self.client_request_timeout = client_request_timeout
         self.file_manager = FileManager()
         self.jinja_env = Environment(
             loader=FileSystemLoader(self.templates_path),

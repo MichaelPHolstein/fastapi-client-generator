@@ -1,6 +1,8 @@
 import re
 from typing import Optional
 
+import requests
+
 
 def slugify(value: str) -> str:
     """
@@ -83,3 +85,20 @@ def convert_ref_to_import_path(ref: str) -> str:
     module = f"{pascal_to_snake(ref_name)}_schema"
     symbol = convert_ref_to_class_name(ref)
     return f"from ..schemas.{module} import {symbol}"
+
+
+def download_api_spec_content(api_spec_url: str) -> dict:
+    """
+    Downloads the API-spec based on the provided `api_spec_url`.
+
+    Raises exception when failed.
+
+    Args:
+        api_spec_url: The URL of the OpenAPI spec to download.
+
+    Returns:
+        The API-spec content as dict
+    """
+    response = requests.get(url=api_spec_url, timeout=15)
+    response.raise_for_status()
+    return response.json()

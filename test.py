@@ -5,9 +5,8 @@ from src.fastapi_client_generator import FastapiClientGenerator
 # ).generate()
 
 api_client_generator = FastapiClientGenerator(
-    api_spec_url="https://api.bol.com/retailer/public/apispec/Retailer%20API%20-%20v10",
     client_name="bol_com_package",
-).generate()
+).from_file_path("assets/openapi-mock.json")
 
 # api_client_generator = FastapiClientGenerator(
 #     api_spec_url="https://api.weather.gov/openapi.json",
