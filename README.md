@@ -17,7 +17,7 @@ This package uses **[Ruff](https://github.com/astral-sh/ruff)** to ensure consis
 
 ## Generate within python file
 
-> **Note:** The examples below use `ClientAlpha`.  
+> ℹ️ **Note:** The examples below use `ClientAlpha`.  
 > Once this package reaches a stable version, `Client` will become the default class name.  
 > Using `ClientAlpha` avoids breaking existing generated clients in the future.
 
