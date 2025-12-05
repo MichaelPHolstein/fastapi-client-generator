@@ -83,6 +83,5 @@ class ClientBaseBuilder(BuilderInterface):
             {
                 "client_base_classes": self._client_base_classes,
                 "client_base_imports": sorted(self._client_base_imports, key=lambda x: x[0]),
-                "open_api_spec_url": self._config.api_spec_url,
             }
         )

@@ -1,12 +1,28 @@
-    
-def {{ method_name }}(self, {{ method_parameters.functional_arguments }}{{ ", " + method_request_body.functional_arguments if method_request_body.exists else "" }}):
+    {% set request_body_args = ", " + method_request_body.functional_arguments if method_request_body.exists else "" %}
+    {% set content_type_header = "'Content-Type': content_type," if method_request_body.exists else "" %}
+    {% set request_body_argument = method_request_body.request_body_argument if method_request_body.exists else "" %}
+
+    def {{ method_name }}(self, {{ method_parameters.functional_arguments }}{{ request_body_args}}) -> {{ method_response.response_type }}:
         """{{ method_docstring }}
+Args:
+    - headers (Dict): HTTP headers that are specifically required for current API endpoint.
+    {% for docstring_arg in method_parameters.docstring_args -%}
+    - {{docstring_arg}}
+    {% endfor -%}
+    {% for docstring_arg in method_request_body.docstring_args -%}
+    - {{docstring_arg}}
+    {% endfor %}
+Returns:
+    {{ method_response.docstring_return }}
         """
-        return self._request_base.{{ method_name}}(
+        response = self._request_base.{{ method_name}}(
             uri=f"{{endpoint_path}}",
             headers={
-                {{ "'Content-Type': content_type, " if method_request_body.exists else "" }}
+                {{ content_type_header }}
                 **headers
             },
-            params={{method_parameters.query_parameters}}
+            params={{method_parameters.query_parameters}},
+            {{ request_body_argument }}
         )
+
+        return {{ method_response.method_response }}

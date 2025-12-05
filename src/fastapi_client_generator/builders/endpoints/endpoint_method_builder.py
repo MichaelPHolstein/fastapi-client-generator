@@ -1,3 +1,5 @@
+from typing import Dict
+
 from fastapi_client_generator.builders.endpoints.endpoint_method_docstring_builder import (
     EndpointMethodDocstringBuilder,
 )
@@ -6,6 +8,9 @@ from fastapi_client_generator.builders.endpoints.endpoint_method_parameter_build
 )
 from fastapi_client_generator.builders.endpoints.endpoint_method_request_body_builder import (
     EndpointMethodRequestBodyBuilder,
+)
+from fastapi_client_generator.builders.endpoints.endpoint_method_response_builder import (
+    EndpointMethodResponseBuilder,
 )
 from fastapi_client_generator.interfaces.builder_interface import BuilderInterface
 from fastapi_client_generator.shared.config import Config
@@ -26,27 +31,46 @@ class EndpointMethodBuilder(BuilderInterface):
         self._method_name = method_name
         self._method_data = method_data
 
-    def build(self) -> str:
+    def build(self) -> Dict:
         """
         Generates a python function for the given endpoint based on the method information.
 
         Returns:
-            A jinja loaded template for the given endpoint method.
+            A dictionary containing the method_template and method_imports
         """
 
-        data = EndpointMethodParameterBuilder(self._method_data).build()
-        print(data)
-        return self._config.jinja_env.get_template(
+        method_docstring = EndpointMethodDocstringBuilder(
+            endpoint_path=self._endpoint_path,
+            method_name=self._method_name,
+            method_data=self._method_data,
+        ).build()
+        method_parameters = EndpointMethodParameterBuilder(self._method_data).build()
+        method_request_body = EndpointMethodRequestBodyBuilder(self._method_data).build()
+        method_response = EndpointMethodResponseBuilder(self._method_data).build()
+
+        method_function = self._config.jinja_env.get_template(
             name=TemplateEnum.ENDPOINT_METHOD_TEMPLATE.value
         ).render(
             {
                 "endpoint_path": self._process_endpoint_path(),
                 "method_name": self._method_name,
-                "method_docstring": EndpointMethodDocstringBuilder(self._method_data).build(),
-                "method_parameters": EndpointMethodParameterBuilder(self._method_data).build(),
-                "method_request_body": EndpointMethodRequestBodyBuilder(self._method_data).build(),
+                "method_docstring": method_docstring,
+                "method_parameters": method_parameters,
+                "method_request_body": method_request_body,
+                "method_response": method_response,
             }
         )
+
+        method_schema_imports = [
+            *method_parameters.get("schema_imports", []),
+            *method_request_body.get("schema_imports", []),
+            *method_response.get("schema_imports", []),
+        ]
+
+        return {
+            "method_function": method_function,
+            "method_schema_imports": method_schema_imports,
+        }
 
     def _process_endpoint_path(self) -> str:
         """

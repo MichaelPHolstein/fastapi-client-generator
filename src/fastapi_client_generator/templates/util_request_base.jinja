@@ -18,7 +18,7 @@ class RequestBase:
         self,
         method: str,
         uri: str,
-        payload: Optional[Dict[str, Any]] = None,
+        request_body: Optional[Dict[str, Any]] = None,
         timeout: int = 15,
         headers: Optional[Dict[str, str]] = None,
         params: Optional[Dict[str, Any]] = None,
@@ -30,7 +30,7 @@ class RequestBase:
             method=method.upper(),
             url=self._resolve_url(uri),
             headers=req_headers,
-            json=payload if payload else None,
+            json=request_body if request_body else None,
             timeout=timeout,
             params=params
         )

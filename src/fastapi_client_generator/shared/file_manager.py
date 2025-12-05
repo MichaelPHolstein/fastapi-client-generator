@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Optional, Union
 
 
 class FileManager:
@@ -31,7 +31,7 @@ class FileManager:
         with file_path.open(encoding="utf-8") as f:
             return json.load(f)
 
-    def save_json(self, file_path: Path, data: Any, indent: int = 2) -> None:
+    def save_json(self, file_path: Path, data: Union[dict, list], indent: int = 2) -> None:
         """
         Writes any data as JSON to the given file path.
 

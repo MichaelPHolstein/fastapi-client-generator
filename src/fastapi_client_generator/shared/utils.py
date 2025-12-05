@@ -1,6 +1,8 @@
 import re
 from typing import Optional
 
+import requests
+
 
 def slugify(value: str) -> str:
     """
@@ -60,12 +62,43 @@ def map_primitive(primitive_type: Optional[str]) -> str:
     return mapping.get(primitive_type, "Any")
 
 
-def map_oa_ref(ref: str) -> str:
+def convert_ref_to_class_name(ref: str) -> str:
     """
-    Converts OpenAPI schema references to Schemas.
+    Converts an OpenAPI schema reference into a schema class name.
 
     Example:
-        Converts '#/components/schemas/ValidationError' -> 'ValidationErrorSchema'
+        '#/components/schemas/ValidationError' -> 'ValidationErrorSchema'
     """
     name = ref.split("/")[-1]
     return f"{name}Schema"
+
+
+def convert_ref_to_import_path(ref: str) -> str:
+    """
+    Converts an OpenAPI schema reference into a Python import statement.
+
+    Example:
+        '#/components/schemas/ValidationError' ->
+        'from .validation_error_schema import ValidationErrorSchema'
+    """
+    ref_name = ref.split("/")[-1]
+    module = f"{pascal_to_snake(ref_name)}_schema"
+    symbol = convert_ref_to_class_name(ref)
+    return f"from ..schemas.{module} import {symbol}"
+
+
+def download_api_spec_content(api_spec_url: str) -> dict:
+    """
+    Downloads the API-spec based on the provided `api_spec_url`.
+
+    Raises exception when failed.
+
+    Args:
+        api_spec_url: The URL of the OpenAPI spec to download.
+
+    Returns:
+        The API-spec content as dict
+    """
+    response = requests.get(url=api_spec_url, timeout=15)
+    response.raise_for_status()
+    return response.json()

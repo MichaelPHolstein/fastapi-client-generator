@@ -5,7 +5,7 @@ from fastapi_client_generator.builders.schema.schema_field_builder import Schema
 from fastapi_client_generator.interfaces.builder_interface import BuilderInterface
 from fastapi_client_generator.shared.config import Config
 from fastapi_client_generator.shared.template_enum import TemplateEnum
-from fastapi_client_generator.shared.utils import pascal_to_snake
+from fastapi_client_generator.shared.utils import convert_ref_to_import_path, pascal_to_snake
 
 
 class SchemaBuilder(BuilderInterface):
@@ -73,18 +73,16 @@ class SchemaBuilder(BuilderInterface):
             A list container all required imports.
         """
         ref_list = self._collect_schema_ref_list()
-        import_list: List[str] = []
+        schema_imports = []
 
         for ref_name in sorted(ref_list):
             if ref_name == self._schema_name:
                 continue
 
-            module = f"{pascal_to_snake(ref_name)}_schema"
-            symbol = f"{ref_name}Schema"
-            import_line = f"from .{module} import {symbol}"
-            import_list.append(import_line)
+            import_path = convert_ref_to_import_path(ref_name)
+            schema_imports.append(import_path)
 
-        return import_list
+        return schema_imports
 
     def _collect_schema_ref_list(self) -> Set[str]:
         """
@@ -138,8 +136,6 @@ class SchemaBuilder(BuilderInterface):
 
         The value is stored within the ref_list.
         """
-        if not isinstance(ref_str, str):
-            return
         parts = ref_str.split("/")
         if parts:
             ref_list.add(parts[-1])

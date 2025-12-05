@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+permissions:
+  contents: write
+
+jobs:
+  lint:
+    name: Ruff Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install UV
+        uses: astral-sh/setup-uv@v1
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run Ruff
+        run: uv run ruff check .
+
+  tests:
+    name: Tests + Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install UV
+        uses: astral-sh/setup-uv@v1
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Install dev dependencies
+        run: uv add pytest pytest-cov genbadge defusedxml
+      - name: Run tests with coverage
+        run: |
+          uv run python -m pytest \
+            --cov=fastapi_client_generator \
+            --cov-report=xml \
+            --cov-report=term-missing
+
+      - name: Generate coverage badge
+        run: |
+          mkdir -p .github/badges
+          uv run genbadge coverage -i coverage.xml -o .github/badges/coverage.svg
+
+      - name: Commit badge if changed
+        run: |
+          if ! git diff --quiet; then
+            git config user.name "github-actions"
+            git config user.email "github-actions@github.com"
+            git add .github/badges/coverage.svg
+            git commit -m "Update coverage badge"
+            git push
+          fi

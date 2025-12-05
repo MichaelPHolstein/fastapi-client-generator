@@ -6,7 +6,7 @@ from fastapi_client_generator.shared.template_enum import TemplateEnum
 
 class SchemaProcessor(ProcessorInterface):
     def __init__(self, config: Config):
-        self._config = config
+        super().__init__(config)
 
     def run(self):
         """
