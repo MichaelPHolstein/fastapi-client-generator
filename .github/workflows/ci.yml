@@ -43,6 +43,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
+          uv add pytest pytest-cov
           uv run python -m pytest \
             --cov=fastapi_client_generator \
             --cov-report=xml \
