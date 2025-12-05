@@ -73,18 +73,18 @@ def convert_ref_to_class_name(ref: str) -> str:
     return f"{name}Schema"
 
 
-def convert_ref_to_import_path(ref: str) -> str:
+def convert_ref_to_import_path(import_base: str, ref: str) -> str:
     """
     Converts an OpenAPI schema reference into a Python import statement.
 
     Example:
         '#/components/schemas/ValidationError' ->
-        'from .validation_error_schema import ValidationErrorSchema'
+        'from client_name.schemas.validation_error_schema import ValidationErrorSchema'
     """
     ref_name = ref.split("/")[-1]
     module = f"{pascal_to_snake(ref_name)}_schema"
     symbol = convert_ref_to_class_name(ref)
-    return f"from ..schemas.{module} import {symbol}"
+    return f"from {import_base}.schemas.{module} import {symbol}"
 
 
 def download_api_spec_content(api_spec_url: str) -> dict:

@@ -58,6 +58,7 @@ class EndpointBuilder(BuilderInterface):
             name=TemplateEnum.ENDPOINT_TEMPLATE.value,
         ).render(
             {
+                "import_base": self._config.import_base,
                 "endpoint_class_name": self._endpoint_class_name,
                 "endpoint_path": self._endpoint_path,
                 "method_schema_imports": endpoint_methods.get("method_schema_imports", []),

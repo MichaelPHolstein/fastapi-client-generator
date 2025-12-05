@@ -44,9 +44,15 @@ class EndpointMethodBuilder(BuilderInterface):
             method_name=self._method_name,
             method_data=self._method_data,
         ).build()
-        method_parameters = EndpointMethodParameterBuilder(self._method_data).build()
-        method_request_body = EndpointMethodRequestBodyBuilder(self._method_data).build()
-        method_response = EndpointMethodResponseBuilder(self._method_data).build()
+        method_parameters = EndpointMethodParameterBuilder(
+            config=self._config, method_data=self._method_data
+        ).build()
+        method_request_body = EndpointMethodRequestBodyBuilder(
+            config=self._config, method_data=self._method_data
+        ).build()
+        method_response = EndpointMethodResponseBuilder(
+            config=self._config, method_data=self._method_data
+        ).build()
 
         method_function = self._config.jinja_env.get_template(
             name=TemplateEnum.ENDPOINT_METHOD_TEMPLATE.value

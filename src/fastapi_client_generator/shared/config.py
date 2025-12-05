@@ -47,6 +47,20 @@ class Config:
         return Path.cwd() / slugify(self.client_name)
 
     @property
+    def import_base(self) -> str:
+        """
+        The root import namespace used when generating absolute imports
+        inside the client package.
+
+        This value determines the top-level package path (e.g. ``my_client``)
+        that all generated modules will reference when importing each other.
+
+        Returns:
+            The base import path for the generated API client.
+        """
+        return slugify(self.client_name)
+
+    @property
     def templates_path(self) -> Path:
         """Path to the folder containing all Jinja2 templates."""
         return Path(__file__).resolve().parent.parent / "templates"

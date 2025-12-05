@@ -1,6 +1,7 @@
 from typing import Dict, List
 
 from fastapi_client_generator.interfaces.builder_interface import BuilderInterface
+from fastapi_client_generator.shared.config import Config
 from fastapi_client_generator.shared.utils import (
     convert_ref_to_class_name,
     convert_ref_to_import_path,
@@ -10,9 +11,10 @@ from fastapi_client_generator.shared.utils import (
 class EndpointMethodRequestBodyBuilder(BuilderInterface):
     def __init__(
         self,
+        config: Config,
         method_data: dict,
     ) -> None:
-        super().__init__(None)
+        super().__init__(config)
         self._method_data = method_data
         self._exists = self._is_existing()
         self._request_body_type = self._determ_request_body_type()  # ← added
@@ -103,7 +105,9 @@ class EndpointMethodRequestBodyBuilder(BuilderInterface):
                 continue
 
             schema: Dict = content_data.get("schema", {})
-            schema_import_path = convert_ref_to_import_path(ref=schema.get("$ref"))
+            schema_import_path = convert_ref_to_import_path(
+                import_base=self._config.import_base, ref=schema.get("$ref")
+            )
             schema_imports.append(schema_import_path)
 
         return schema_imports

@@ -125,7 +125,7 @@ class EndpointProcessor(ProcessorInterface):
             The convert endpoint as import path
         """
 
-        return f"from .endpoints.{endpoint_file_name} import {endpoint_class_name}"
+        return f"from {self._config.import_base}.endpoints.{endpoint_file_name} import {endpoint_class_name}"
 
     def _read_endpoint_data(self) -> dict:
         """Returns all endpoints paths from the `api-spec.json`."""

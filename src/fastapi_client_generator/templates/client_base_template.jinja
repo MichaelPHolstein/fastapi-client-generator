@@ -1,6 +1,6 @@
 from typing import Dict
 
-from .utils.request_base import RequestBase
+from {{ import_base }}.utils.request_base import RequestBase
 {%- for import in client_base_imports %}
 {{ import }}
 {%- endfor %}
