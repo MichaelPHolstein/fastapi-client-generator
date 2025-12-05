@@ -1,5 +1,8 @@
 # FastAPI Client Generator
 
+![CI](https://github.com/MichaelPHolstein/fastapi-client-generator/actions/workflows/ci.yml/badge.svg)
+![Coverage](.github/badges/coverage.svg)
+
 A utility that automatically generates a **pure-Python API client** from an **OpenAPI specification**, optimized for seamless integration with **FastAPI** applications.
 
 This package uses **[Ruff](https://github.com/astral-sh/ruff)** to ensure consistent code quality — the generated client is automatically **linted and formatted**, producing clean and maintainable Python code.
