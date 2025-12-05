@@ -20,6 +20,9 @@ jobs:
       - name: Install UV
         uses: astral-sh/setup-uv@v7
 
+      - name: Create virtual environment
+        run: uv venv
+
       - name: Build package
         run: uv build
 
