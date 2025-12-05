@@ -1,6 +1,6 @@
 from typing import Dict, Optional, Any, Literal
 
-from ..utils.request_base import RequestBase
+from {{ import_base }}.utils.request_base import RequestBase
 
 {% for method_schema_import in method_schema_imports %}
 {{ method_schema_import }}

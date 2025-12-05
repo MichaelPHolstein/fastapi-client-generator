@@ -14,7 +14,7 @@ from fastapi_client_generator.shared.utils import download_api_spec_content
 
 
 class FastapiClientGenerator:
-    def __init__(self, *, client_name: str):
+    def __init__(self, client_name: str):
         """
         FastAPI client generator
 

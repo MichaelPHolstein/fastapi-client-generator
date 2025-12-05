@@ -68,7 +68,7 @@ class ClientBaseBuilder(BuilderInterface):
         """
         return self._config.jinja_env.get_template(
             name=TemplateEnum.CLIENT_INIT_TEMPLATE.value
-        ).render()
+        ).render({"import_base": self._config.import_base})
 
     def _create_client_base_code(self) -> str:
         """
@@ -81,6 +81,7 @@ class ClientBaseBuilder(BuilderInterface):
             name=TemplateEnum.CLIENT_BASE_TEMPLATE.value
         ).render(
             {
+                "import_base": self._config.import_base,
                 "client_base_classes": self._client_base_classes,
                 "client_base_imports": sorted(self._client_base_imports, key=lambda x: x[0]),
             }

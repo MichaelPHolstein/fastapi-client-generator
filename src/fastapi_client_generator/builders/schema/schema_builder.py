@@ -45,6 +45,7 @@ class SchemaBuilder(BuilderInterface):
         """
         return self._config.jinja_env.get_template(name=TemplateEnum.SCHEMA_TEMPLATE.value).render(
             {
+                "import_base": self._config.import_base,
                 "schema_name": f"{self._schema_name}Schema",
                 "schema_fields": self._create_schema_field_list(),
                 "import_list": self._create_imports(),
@@ -79,7 +80,9 @@ class SchemaBuilder(BuilderInterface):
             if ref_name == self._schema_name:
                 continue
 
-            import_path = convert_ref_to_import_path(ref_name)
+            import_path = convert_ref_to_import_path(
+                import_base=self._config.import_base, ref=ref_name
+            )
             schema_imports.append(import_path)
 
         return schema_imports
