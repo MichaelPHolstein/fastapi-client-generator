@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install UV
-        uses: astral-sh/setup-uv@v1
+        uses: astral-sh/setup-uv@v7
 
       - name: Install dependencies
         run: uv sync
@@ -39,7 +39,7 @@ jobs:
         uses: astral-sh/setup-uv@v7
 
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --frozen
 
       - name: Install dev dependencies
         run: uv sync --group dev
@@ -54,6 +54,9 @@ jobs:
         run: |
           mkdir -p .github/badges
           uv run genbadge coverage -i coverage.xml -o .github/badges/coverage.svg
+
+      - name: Ignore uv.lock updates
+        run: git restore uv.lock
 
       - name: Commit badge if changed
         run: |
