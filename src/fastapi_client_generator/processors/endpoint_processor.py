@@ -40,9 +40,10 @@ class EndpointProcessor(ProcessorInterface):
         self._config.log_action(action)
 
         for endpoint_path, endpoint_data in self._read_endpoint_data().items():
-            endpoint_attribute_name = self._create_endpoint_attribute_name(endpoint_path)
-            endpoint_class_name = self._create_endpoint_class_name(endpoint_path)
-            endpoint_file_name = self._create_endpoint_file_name(endpoint_path)
+            endpoint_path_normalized = self._create_endpoint_path_normalized(endpoint_path)
+            endpoint_attribute_name = self._create_endpoint_attribute_name(endpoint_path_normalized)
+            endpoint_class_name = self._create_endpoint_class_name(endpoint_path_normalized)
+            endpoint_file_name = self._create_endpoint_file_name(endpoint_path_normalized)
             endpoint_import_path = self._create_endpoint_import_path(
                 endpoint_file_name, endpoint_class_name
             )
@@ -66,33 +67,51 @@ class EndpointProcessor(ProcessorInterface):
             client_base_imports=self._client_base_imports,
         ).build()
 
-    def _create_endpoint_attribute_name(self, endpoint_path: str) -> str:
+    def _create_endpoint_path_normalized(self, endpoint_path: str) -> str:
+        """
+        Normalizes an OpenAPI endpoint path into a usable internal identifier.
+
+        This ensures that special or ambiguous paths (e.g. the root path "/")
+        are converted into valid, meaningful names for use in filenames, classes,
+        attributes, and import paths. For example, the root path is mapped to "root"
+        to avoid empty or invalid identifiers.
+
+        Returns:
+            A normalized string representation of the endpoint path suitable for
+            client generation and folder structure.
+        """
+
+        special_paths = {"/": "root"}
+
+        return special_paths.get(endpoint_path, endpoint_path)
+
+    def _create_endpoint_attribute_name(self, endpoint_path_normalized: str) -> str:
         """
         Converts endpoints from path into a attribute that is called within the base_client.
 
         Returns:
             The endpoint path converted to attribute
         """
-        return pascal_to_snake(endpoint_path)
+        return pascal_to_snake(endpoint_path_normalized)
 
-    def _create_endpoint_file_name(self, endpoint_path: str) -> str:
+    def _create_endpoint_file_name(self, endpoint_path_normalized: str) -> str:
         """
         Converts endpoints from path to endpoint_file_name.
 
         Returns:
             The converted endpoint path
         """
-        file_name = pascal_to_snake(endpoint_path)
+        file_name = pascal_to_snake(endpoint_path_normalized)
         return f"{file_name}_endpoint"
 
-    def _create_endpoint_class_name(self, endpoint_path: str) -> str:
+    def _create_endpoint_class_name(self, endpoint_path_normalized: str) -> str:
         """
         Converts endpoints from path to class names
 
         Returns:
             The convert endpoint classname
         """
-        class_name = snake_to_pascal(endpoint_path)
+        class_name = snake_to_pascal(endpoint_path_normalized)
 
         return f"{class_name}Endpoint"
 
