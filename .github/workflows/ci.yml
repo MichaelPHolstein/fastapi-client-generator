@@ -36,13 +36,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install UV
-        uses: astral-sh/setup-uv@v1
+        uses: astral-sh/setup-uv@v7
 
       - name: Install dependencies
         run: uv sync
 
       - name: Install dev dependencies
-        run: uv add pytest pytest-cov genbadge defusedxml
+        run: uv sync --group dev
       - name: Run tests with coverage
         run: |
           uv run python -m pytest \
