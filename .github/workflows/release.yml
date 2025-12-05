@@ -18,7 +18,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install UV
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v1
+
+      - name: Install hatchling (required for valid METADATA)
+        run: uv pip install hatchling
 
       - name: Build package
         run: uv build
