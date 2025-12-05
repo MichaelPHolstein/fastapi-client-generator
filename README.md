@@ -1,7 +1,7 @@
 # FastAPI Client Generator
 
 ![CI](https://github.com/MichaelPHolstein/fastapi-client-generator/actions/workflows/ci.yml/badge.svg)
-![Coverage](.github/badges/coverage.svg)
+![Coverage](https://github.com/MichaelPHolstein/fastapi-client-generator/blob/main/.github/badges/coverage.svg)
 
 A utility that automatically generates a **pure-Python API client** from an **OpenAPI specification**, optimized for seamless integration with **FastAPI** applications.
 
