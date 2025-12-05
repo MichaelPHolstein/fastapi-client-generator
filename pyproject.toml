@@ -14,9 +14,6 @@ dependencies = [
     "typer>=0.20.0",
 ]
 
-[project.scripts]
-fastapi-client-generator = "fastapi_client_generator:main"
-
 [build-system]
 requires = ["uv_build>=0.9.5,<0.10.0"]
 build-backend = "uv_build"
@@ -38,3 +35,6 @@ indent-style = "space"
 
 [tool.coverage.run]
 omit = ["src/fastapi_client_generator/templates/*"]
+
+[project.scripts]
+fastapi-client-generator = "fastapi_client_generator.cli:cli"

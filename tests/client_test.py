@@ -1,7 +1,6 @@
 from pathlib import Path
 
 from fastapi_client_generator import FastapiClientGenerator
-
 from tests.fastapi_instance import fastapi_instance
 
 

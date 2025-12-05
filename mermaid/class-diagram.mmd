@@ -107,9 +107,10 @@ classDiagram
         - _create_endpoint_folder()
         - _create_endpoints()
         - _create_client_base()
-        - _create_endpoint_attribute_name(endpoint_path: str) str
-        - _create_endpoint_file_name(endpoint_path: str) str
-        - _create_endpoint_class_name(endpoint_path: str) str
+        - _create_endpoint_path_normalized(endpoint_path: str) str
+        - _create_endpoint_attribute_name(endpoint_path_normalized: str) str
+        - _create_endpoint_file_name(endpoint_path_normalized: str) str
+        - _create_endpoint_class_name(endpoint_path_normalized: str) str
         - _create_endpoint_import_path(endpoint_file_name: str, endpoint_class_name: str) str
         - _read_endpoint_data() dict
     }
