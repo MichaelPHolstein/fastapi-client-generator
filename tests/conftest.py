@@ -1,9 +1,9 @@
-from pathlib import Path
 import shutil
+from pathlib import Path
+
 import pytest
 
 from fastapi_client_generator import FastapiClientGenerator
-
 
 MOCK_CLIENT_NAME = "mock_client"
 

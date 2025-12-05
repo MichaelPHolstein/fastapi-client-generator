@@ -2,6 +2,8 @@ import json
 from pathlib import Path
 from typing import Union
 
+from fastapi import FastAPI
+
 from fastapi_client_generator.processors.endpoint_processor import EndpointProcessor
 from fastapi_client_generator.processors.post_processor import PostProcessor
 from fastapi_client_generator.processors.pre_processor import PreProcessor
@@ -9,7 +11,6 @@ from fastapi_client_generator.processors.schema_processor import SchemaProcessor
 from fastapi_client_generator.processors.utils_processor import UtilsProcessor
 from fastapi_client_generator.shared.config import Config
 from fastapi_client_generator.shared.utils import download_api_spec_content
-from fastapi import FastAPI
 
 
 class FastapiClientGenerator:
