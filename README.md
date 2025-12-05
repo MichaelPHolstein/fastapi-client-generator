@@ -145,8 +145,6 @@ Two CLI commands are available:
 
 Both commands use the same parameters shown in the Python examples above.
 
----
-
 ### 1. Generate a Client from a Remote OpenAPI URL
 
 This CLI example matches the Python example where the API specification is loaded from the public documentation of a Dutch retailer:
@@ -242,8 +240,6 @@ Before submitting a PR, please:
 
 If you have ideas, questions, or want to propose new features, feel free to open an **Issue**.  
 I appreciate every contribution that helps make this project better.
-
----
 
 ## License
 
