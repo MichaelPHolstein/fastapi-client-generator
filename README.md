@@ -251,3 +251,5 @@ This project is licensed under the **MIT License**.
 You’re free to use, modify, distribute, and integrate this package in both open-source and commercial applications, as long as the terms of the MIT License are followed.
 
 You can find the full license text in the `LICENSE` file included in this repository.
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/michaelpholstein)
