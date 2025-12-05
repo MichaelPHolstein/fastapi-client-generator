@@ -55,6 +55,9 @@ jobs:
           mkdir -p .github/badges
           uv run genbadge coverage -i coverage.xml -o .github/badges/coverage.svg
 
+      - name: Ignore uv.lock updates
+        run: git restore uv.lock
+
       - name: Commit badge if changed
         run: |
           if ! git diff --quiet; then
