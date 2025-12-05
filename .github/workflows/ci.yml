@@ -42,7 +42,7 @@ jobs:
         run: uv sync
 
       - name: Install dev dependencies
-        run: pip install pytest pytest-cov genbadge defusedxml
+        run: uv pip install pytest pytest-cov genbadge defusedxml
       - name: Run tests with coverage
         run: |
           uv run python -m pytest \
