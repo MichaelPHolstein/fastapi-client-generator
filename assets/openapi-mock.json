@@ -368,6 +368,15 @@
                 "properties": {
                     "empty_value": null
                 }
+            },
+            "TimeValidity": {
+                "developers_note": "Contains a schema where it only contains a primitive type including a enum",
+                "description": "Specifies how long the order remains active: \n* DAY: The order will automatically expire if not executed by midnight in the time zone of the instrument's exchange.\n* GOOD_TILL_CANCEL: The order remains active indefinitely until it is either filled or explicitly cancelled by you.",
+                "enum": [
+                    "DAY",
+                    "GOOD_TILL_CANCEL"
+                ],
+                "type": "string"
             }
         }
     }

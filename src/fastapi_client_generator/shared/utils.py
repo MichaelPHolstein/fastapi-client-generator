@@ -1,5 +1,5 @@
 import re
-from typing import Optional
+from typing import Optional, Dict
 
 import requests
 
@@ -87,6 +87,21 @@ def convert_ref_to_import_path(import_base: str, ref: str) -> str:
     return f"from {import_base}.schemas.{module} import {symbol}"
 
 
+def convert_enum_to_literal(obj: Dict):
+    """
+    Converts an OpenAPI enum definition into a Python Literal type.
+
+    Args:
+        obj: A schema object containing an enum definition.
+
+    Returns:
+        A string representing a Literal type that includes all possible enum values.
+    """
+    enum_items = obj.get("enum", [])
+    items_as_literals = ", ".join(repr(item) for item in enum_items)
+    return f"Literal[{items_as_literals}]"
+
+
 def download_api_spec_content(api_spec_url: str) -> dict:
     """
     Downloads the API-spec based on the provided `api_spec_url`.
@@ -102,3 +117,27 @@ def download_api_spec_content(api_spec_url: str) -> dict:
     response = requests.get(url=api_spec_url, timeout=15)
     response.raise_for_status()
     return response.json()
+
+
+def is_primitive_type(type_name: str) -> bool:
+    """
+    Checks whether the given OpenAPI type represents a primitive value.
+
+    Primitive OpenAPI types include:
+        - string
+        - integer
+        - number
+        - boolean
+
+    Example:
+        "string" -> True
+        "array" -> False
+        "object" -> False
+
+    Args:
+        type_name: The OpenAPI type value from a schema.
+
+    Returns:
+        True if the type is a primitive JSON type, otherwise False.
+    """
+    return type_name in {"string", "integer", "number", "boolean"}

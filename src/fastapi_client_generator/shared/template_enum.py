@@ -9,5 +9,6 @@ class TemplateEnum(str, Enum):
     ENDPOINT_TEMPLATE = "endpoint_template.jinja"
     ENDPOINT_METHOD_TEMPLATE = "endpoint_method_template.jinja"
     SCHEMA_BASE_TEMPLATE = "schema_base_template.jinja"
-    SCHEMA_TEMPLATE = "schema_template.jinja"
+    SCHEMA_OBJECT_TEMPLATE = "schema_object_template.jinja"
+    SCHEMA_PRIMITIVE_TEMPLATE = "schema_primitive_template.jinja"
     UTIL_REQUEST_BASE = "util_request_base.jinja"

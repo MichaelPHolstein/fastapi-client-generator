@@ -5,7 +5,13 @@ from fastapi_client_generator.builders.schema.schema_field_builder import Schema
 from fastapi_client_generator.interfaces.builder_interface import BuilderInterface
 from fastapi_client_generator.shared.config import Config
 from fastapi_client_generator.shared.template_enum import TemplateEnum
-from fastapi_client_generator.shared.utils import convert_ref_to_import_path, pascal_to_snake
+from fastapi_client_generator.shared.utils import (
+    convert_enum_to_literal,
+    convert_ref_to_import_path,
+    is_primitive_type,
+    map_primitive,
+    pascal_to_snake,
+)
 
 
 class SchemaBuilder(BuilderInterface):
@@ -43,7 +49,37 @@ class SchemaBuilder(BuilderInterface):
         Returns:
             The rendered Jinja template as string
         """
-        return self._config.jinja_env.get_template(name=TemplateEnum.SCHEMA_TEMPLATE.value).render(
+
+        schema_type = self._schema_data.get("type")
+
+        if is_primitive_type(schema_type):
+            return self._create_primitive_schema()
+
+        return self._create_object_schema()
+
+    def _create_primitive_schema(self) -> str:
+        """Converts a OpenAPI primitive type schema to a Pydantic schema."""
+
+        schema_declaration = map_primitive(self._schema_data.get("type"))
+
+        if "enum" in self._schema_data:
+            schema_declaration = convert_enum_to_literal(self._schema_data)
+
+        return self._config.jinja_env.get_template(
+            name=TemplateEnum.SCHEMA_PRIMITIVE_TEMPLATE.value,
+        ).render(
+            {
+                "schema_name": f"{self._schema_name}Schema",
+                "schema_declaration": schema_declaration,
+                "description": self._schema_data.get("description"),
+            }
+        )
+
+    def _create_object_schema(self) -> str:
+        """Converts a OpenAPI object type schema to a Pydantic schema."""
+        return self._config.jinja_env.get_template(
+            name=TemplateEnum.SCHEMA_OBJECT_TEMPLATE.value
+        ).render(
             {
                 "import_base": self._config.import_base,
                 "schema_name": f"{self._schema_name}Schema",
@@ -58,10 +94,11 @@ class SchemaBuilder(BuilderInterface):
         generated_field_list = []
 
         for field_key, field_obj in properties.items():
-            schema_field = SchemaFieldBuilder(
+            field_name, field_declaration = SchemaFieldBuilder(
                 field_key=field_key, field_obj=field_obj, schema_obj=self._schema_data
             ).build()
 
+            schema_field = f"{field_name}: {field_declaration}"
             generated_field_list.append(schema_field)
 
         return generated_field_list

@@ -1,0 +1,9 @@
+from __future__ import annotations
+from pydantic import Field
+from typing import Optional, List, Any, Literal
+
+
+{{ schema_name }} = {{ schema_declaration }}
+{% if description %}
+"""{{ description }}"""
+{% endif %}
