@@ -17,7 +17,8 @@ class EndpointMethodResponseBuilder(BuilderInterface):
         super().__init__(config)
 
         self._method_data = method_data
-        self._response_ref = self._read_response_ref()
+        self._content_schema = self._read_content_schema()
+        self._response_ref = self._extract_ref(self._content_schema)
 
     def build(self) -> Dict:
         """
@@ -38,11 +39,22 @@ class EndpointMethodResponseBuilder(BuilderInterface):
         Creates the response type for the given endpoint method based on the available responses.
 
         Returns:
-            A schema if the OpenAPI response has a reference. Otherwise it will return a dict.
+            A schema class name, a list of schemas, or Dict as fallback.
         """
+        if self._content_schema:
+            schema_type = self._content_schema.get("type")
 
-        if self._response_ref:
-            return convert_ref_to_class_name(self._response_ref)
+            # Array of referenced model
+            if schema_type == "array":
+                items = self._content_schema.get("items", {})
+                if "$ref" in items:
+                    return f"List[{convert_ref_to_class_name(items['$ref'])}]"
+
+                return "List[Dict]"
+
+            # Single referenced model
+            if "$ref" in self._content_schema:
+                return convert_ref_to_class_name(self._content_schema["$ref"])
 
         return "Dict"
 
@@ -50,66 +62,71 @@ class EndpointMethodResponseBuilder(BuilderInterface):
         """
         Creates the response for the method.
 
-        If the endpoint method as a reference, the response will be wrapped around this response.
-
         Returns:
-            Returns the method response
+            Parsed model instance(s) if a reference exists,
+            otherwise the plain JSON response.
         """
+        if self._content_schema:
+            schema_type = self._content_schema.get("type")
 
-        if self._response_ref:
-            response_class_name = convert_ref_to_class_name(self._response_ref)
-            return f"{response_class_name}(**response.json())"
+            # Array of referenced model
+            if schema_type == "array":
+                items = self._content_schema.get("items", {})
+                if "$ref" in items:
+                    class_name = convert_ref_to_class_name(items["$ref"])
+                    return f"[{class_name}(**item) for item in response.json()]"
+                return "response.json()"
+
+            # Single referenced model
+            if self._response_ref:
+                class_name = convert_ref_to_class_name(self._response_ref)
+                return f"{class_name}(**response.json())"
 
         return "response.json()"
 
     def _create_schema_imports(self) -> List[str]:
         """
-        Checks if there is a response ref.
-
-        Converts the ref to import path when found.
+        Converts the response ref into import statements.
 
         Returns:
             List[str]: A list of fully qualified import paths for the referenced schemas.
         """
-        schema_imports = []
+        if not self._response_ref:
+            return []
 
-        if self._response_ref:
-            import_path = convert_ref_to_import_path(
-                import_base=self._config.import_base, ref=self._response_ref
-            )
-            schema_imports.append(import_path)
-
-        return schema_imports
+        import_path = convert_ref_to_import_path(
+            import_base=self._config.import_base,
+            ref=self._response_ref,
+        )
+        return [import_path]
 
     def _create_docstring_return(self) -> str:
         """
-        Creates the return argument for the docstring based on the response type.
+        Creates the return annotation for the method docstring.
         """
-        if self._response_ref:
-            response_type = convert_ref_to_class_name(self._response_ref)
-        else:
-            response_type = "Dict"
-
+        response_type = self._create_response_type()
         return f"{response_type}: The response returned by the endpoint."
 
-    def _read_response_ref(self) -> Optional[str]:
+    def _read_content_schema(self) -> Optional[Dict]:
         """
-        Checks if there is a reference within any of the HTTP 2xx responses of the current endpoint method.
-
-        NOTE: For now only the first content-type is checked.
+        Extracts the schema from the first valid 2xx content-type response.
 
         Returns:
-            The reference when found within the response. Returns nothing otherwise.
+            The schema dict or None.
         """
         responses: Dict = self._method_data.get("responses", {})
 
         for status, status_info in responses.items():
-            if not self._number_in_between(number=int(status), min=200, max=299):
+            if not self._number_in_between(int(status), 200, 299):
                 continue
 
             content = status_info.get("content", {})
+            schema = self._read_first_content_type(content)
 
-            return self._read_content_has_ref(content)
+            if schema:
+                return schema
+
+        return None
 
     def _number_in_between(self, number: int, min: int, max: int) -> bool:
         """
@@ -118,21 +135,33 @@ class EndpointMethodResponseBuilder(BuilderInterface):
         Returns:
             True if in between.
         """
-        return all(
-            [
-                number >= min,
-                number <= max,
-            ]
-        )
+        return min <= number <= max
 
-    def _read_content_has_ref(self, content: Dict) -> Optional[str]:
+    def _read_first_content_type(self, content: Dict) -> Optional[Dict]:
         """
-        This function determines if there is a OpenAPI reference available within the content.
+        Returns the schema of the first defined content type.
 
         Returns:
-            The first found reference otherwise nothing.
+            The schema dict or None.
         """
         for _, content_data in content.items():
-            schema: Dict = content_data.get("schema", {})
+            return content_data.get("schema", {})
 
-            return schema.get("$ref")
+        return None
+
+    def _extract_ref(self, schema: Optional[Dict]) -> Optional[str]:
+        """
+        Finds a $ref in the schema, or in array items.
+
+        Returns:
+            The reference string or None.
+        """
+        if not schema:
+            return None
+
+        if "$ref" in schema:
+            return schema["$ref"]
+
+        if schema.get("type") == "array":
+            items = schema.get("items", {})
+            return items.get("$ref")
