@@ -1,6 +1,6 @@
 from __future__ import annotations
 from pydantic import Field
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Literal
 from {{ import_base }}.schemas.base_schema import BaseSchema
 {%- if import_list %}
 {%- for import in import_list %}

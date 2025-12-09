@@ -57,6 +57,8 @@ classDiagram
         + build()
         - _create_file_path() Path
         - _create_code() str
+        - _create_primitive_schema() str
+        - _create_object_schema() str
         - _create_schema_field_list() List[str]
         - _create_imports() List[str]
         - _collect_schema_ref_list() Set[str]
@@ -72,7 +74,7 @@ classDiagram
         - _field_obj: dict
         - _schema_obj: dict
 
-        + build()
+        + build() Tuple[str,str]
         - _validate_key_not_reserved() str
         - _stringify_field_params(field_params: List[str]) str
         - _wrap_optional(resolved_type:str) str
@@ -205,7 +207,9 @@ classDiagram
     class EndpointMethodResponseBuilder {
 
         - _config: Config
+
         - _method_data: Dict
+        - _content_schema: Optional[Dict]
         - _response_ref: Optional[str]
 
         + build() Dict
@@ -213,9 +217,10 @@ classDiagram
         - _create_method_response() str
         - _create_schema_imports() List[str]
         - _create_docstring_return() str
-        - _read_response_ref() Optional[str]
+        - _read_content_schema() Optional[Dict]
         - _numbers_in_between(number: int, min: int, max:int) bool
-        - read_content_has_ref(content: Dict) Optional[str]
+        - _read_first_content_type(content: Dict) Optional[Dict]
+        - _extract_ref(schema: Optional[Dict]) Optional[str]
     }
 
     class PostProcessor {

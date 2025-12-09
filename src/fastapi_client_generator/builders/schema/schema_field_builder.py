@@ -1,7 +1,8 @@
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 from fastapi_client_generator.interfaces.builder_interface import BuilderInterface
 from fastapi_client_generator.shared.utils import (
+    convert_enum_to_literal,
     convert_ref_to_class_name,
     map_primitive,
     pascal_to_snake,
@@ -18,22 +19,34 @@ class SchemaFieldBuilder(BuilderInterface):
       - arrays of $ref
     """
 
-    def __init__(self, field_key: str, field_obj: dict, schema_obj: dict) -> None:
+    def __init__(self, field_key: str, field_obj: Dict, schema_obj: Dict) -> None:
         super().__init__(config=None)
         self._field_key = field_key
         self._field_key_snake_case = pascal_to_snake(field_key)
         self._field_obj = field_obj or {}
         self._schema_obj = schema_obj or {}
 
-    def build(self) -> str:
-        """Generates a Pydantic line for the specified field."""
+    def build(self) -> Tuple[str, str]:
+        """
+        Builds the field definition for a Pydantic model.
+
+        This resolves the field's type, applies optional wrapping, determines
+        default values and additional Field(...) parameters, and returns the
+        final key/value pair used in the generated model.
+
+        Returns:
+            A tuple containing:
+                - The field name as it should appear in the model.
+                - The complete field declaration as a string
+                (e.g., `"created_at: Optional[str] = Field(default=None, alias='createdAt')"`).
+        """
         field_type = self._resolve_type(self._field_obj)
 
         field_params = [self._determ_default(), *self._determ_common_params(), self._determ_alias()]
-        return (
-            f"{self._validate_key_not_reserved()}: {self._wrap_optional(field_type)} "
-            f"= Field({self._stringify_field_params(field_params)})"
-        )
+        field_key = self._validate_key_not_reserved()
+        field_declaration = f"{self._wrap_optional(field_type)} = Field({self._stringify_field_params(field_params)})"
+
+        return field_key, field_declaration
 
     def _validate_key_not_reserved(self) -> str:
         """
@@ -106,7 +119,7 @@ class SchemaFieldBuilder(BuilderInterface):
         required = (self._schema_obj or {}).get("required", []) or []
         return self._field_key in required
 
-    def _resolve_type(self, obj: dict) -> str:
+    def _resolve_type(self, obj: Dict) -> str:
         """
         Determines the Python/Pydantic type as a string.
         Cases:
@@ -114,7 +127,7 @@ class SchemaFieldBuilder(BuilderInterface):
         - type == 'array'    -> 'List[<resolved item type>]'
         - primitive          -> via mapping
         """
-        if not isinstance(obj, dict):
+        if not isinstance(obj, Dict):
             return "Any"
 
         if "$ref" in obj:
@@ -125,9 +138,12 @@ class SchemaFieldBuilder(BuilderInterface):
         if field_type == "array":
             return self._resolve_array_type(obj)
 
+        if obj.get("enum"):
+            return convert_enum_to_literal(obj)
+
         return map_primitive(field_type)
 
-    def _resolve_array_type(self, obj: dict) -> str:
+    def _resolve_array_type(self, obj: Dict) -> str:
         """Processes the field type array."""
         items = obj.get("items", {})
 

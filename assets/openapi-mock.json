@@ -193,6 +193,73 @@
                     }
                 }
             }
+        },
+        "/response/single_ref": {
+            "get": {
+                "summary": "Simple 200 with single schema ref",
+                "responses": {
+                    "200": {
+                        "description": "Single Item",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Item"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/response/array_of_ref": {
+            "get": {
+                "summary": "200 returning an array of Item",
+                "responses": {
+                    "200": {
+                        "description": "List of Items",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Item"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/response/array_of_primitive": {
+            "get": {
+                "summary": "200 returning an array of primitive values",
+                "responses": {
+                    "200": {
+                        "description": "List of primitive values",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/response/no_schema_in_2xx": {
+            "get": {
+                "summary": "200 response without a schema/content",
+                "responses": {
+                    "200": {
+                        "description": "Success without schema"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -368,6 +435,15 @@
                 "properties": {
                     "empty_value": null
                 }
+            },
+            "TimeValidity": {
+                "developers_note": "Contains a schema where it only contains a primitive type including a enum",
+                "description": "Specifies how long the order remains active: \n* DAY: The order will automatically expire if not executed by midnight in the time zone of the instrument's exchange.\n* GOOD_TILL_CANCEL: The order remains active indefinitely until it is either filled or explicitly cancelled by you.",
+                "enum": [
+                    "DAY",
+                    "GOOD_TILL_CANCEL"
+                ],
+                "type": "string"
             }
         }
     }
